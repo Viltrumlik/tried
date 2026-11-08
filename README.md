@@ -20,7 +20,7 @@ tried add "sqlite WAL for the job queue" --failed \
   --because "writers lock each other out above ~20 req/s" --tag queue
 
 tried check "sqlite WAL"
-# BU ALLAQACHON SINALGAN: ...  → exit 3
+# THIS WAS ALREADY TRIED: ...  → exit 3
 ```
 
 `tried check` exits `3` when the ground was covered before, so an agent can branch on it and go a different way instead of repeating the work.
@@ -72,8 +72,8 @@ Outside a git repo it falls back to the current folder. `TRIED_FILE` overrides t
 
 ```
 x 4f2a1c8b  sqlite WAL for the job queue
-     chunki: writers lock each other out above ~20 req/s
-     3d oldin · Alisher · #queue
+     because: writers lock each other out above ~20 req/s
+     3d ago · Alisher · #queue
 ```
 
 A year later, that line is the difference between an hour lost and a minute saved.

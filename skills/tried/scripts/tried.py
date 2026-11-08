@@ -186,8 +186,8 @@ def describe(entry, now=None):
     line = "%s %s  %s" % (MARK.get(entry.get("outcome"), "?"),
                           entry.get("id", "")[:8], entry.get("what", ""))
     if entry.get("because"):
-        line += "\n     chunki: %s" % entry["because"]
-    meta = [ago(now - entry.get("at", now)) + " oldin"]
+        line += "\n     because: %s" % entry["because"]
+    meta = [ago(now - entry.get("at", now)) + " ago"]
     if entry.get("who"):
         meta.append(entry["who"])
     if entry.get("tags"):
@@ -217,7 +217,7 @@ def who():
 def cmd_add(args):
     what = " ".join(args.what).strip()
     if not what:
-        raise UsageError("nimani sinaganingizni yozing")
+        raise UsageError("say what you tried")
     outcome = "failed"
     if args.worked:
         outcome = "worked"
@@ -236,29 +236,28 @@ def cmd_add(args):
     if args.json:
         emit_json({"ok": True, "entry": entry})
     else:
-        print("yozildi: %s (%s)" % (entry["id"], outcome))
+        print("recorded: %s (%s)" % (entry["id"], outcome))
         if not entry["because"]:
-            print("maslahat: --because bilan sababini yozing, aks holda "
-                  "keyingi safar nega bo'lmaganini hech kim bilmaydi")
+            print("tip: add --because, or next time nobody will know why it failed")
     return EXIT_OK
 
 
 def cmd_check(args):
     query = " ".join(args.query).strip()
     if not query:
-        raise UsageError("nimani tekshirmoqchisiz?")
+        raise UsageError("check what?")
     hits = search(load(), query, args.threshold)
     if args.json:
         emit_json({"ok": True, "found": bool(hits), "query": query,
                    "matches": [dict(e, score=round(s, 2)) for s, e in hits]})
     elif hits:
-        print("BU ALLAQACHON SINALGAN:")
+        print("THIS WAS ALREADY TRIED:")
         for _, entry in hits[:5]:
             print("  " + describe(entry).replace("\n", "\n  "))
-        print("Oldin natijani o'qing. Boshqa yo'l tanlang yoki nega bu safar "
-              "boshqacha bo'lishini ayting.")
+        print("Read the entry first. Pick a different approach, or say why this "
+              "time is different.")
     else:
-        print("toza: %s bo'yicha yozuv yo'q" % query)
+        print("clear: nothing on record for %s" % query)
     return EXIT_FOUND if hits else EXIT_OK
 
 
@@ -272,7 +271,7 @@ def cmd_list(args):
     if args.json:
         emit_json({"ok": True, "entries": entries})
     elif not entries:
-        print("jurnal bo'sh. `tried add` bilan birinchi yozuvni qo'shing.")
+        print("the log is empty. Add the first entry with `tried add`.")
     else:
         for entry in entries:
             print(describe(entry))
@@ -285,7 +284,7 @@ def cmd_show(args):
         if entry.get("id", "").startswith(args.id):
             emit_json(entry) if args.json else print(describe(entry))
             return EXIT_OK
-    raise UsageError("bunday yozuv yo'q: %s" % args.id)
+    raise UsageError("no such entry: %s" % args.id)
 
 
 def cmd_rm(args):
@@ -297,7 +296,7 @@ def cmd_rm(args):
     if args.json:
         emit_json({"ok": True, "removed": len(entries) - len(keep)})
     else:
-        print("o'chirildi: %s" % args.id)
+        print("removed: %s" % args.id)
     return EXIT_OK
 
 
@@ -307,40 +306,40 @@ def cmd_rm(args):
 def build_parser():
     p = argparse.ArgumentParser(
         prog="tried",
-        description="Sinalgan yondashuvlar jurnali: ikkinchi marta sinamaslik uchun.")
+        description="A log of approaches already attempted, so nobody tries them twice.")
     p.add_argument("--version", action="version", version="tried " + VERSION)
     sub = p.add_subparsers(dest="command")
 
     def add(name, help_text, func):
         sp = sub.add_parser(name, help=help_text, description=help_text)
-        sp.add_argument("--json", action="store_true", help="mashina o'qiydigan chiqish")
+        sp.add_argument("--json", action="store_true", help="machine-readable output")
         sp.set_defaults(func=func)
         return sp
 
-    sp = add("add", "sinalgan yondashuvni yozib qo'yish", cmd_add)
-    sp.add_argument("what", nargs="+", metavar="MATN")
-    sp.add_argument("--because", metavar="SABAB", help="nega shunday tugadi")
-    sp.add_argument("--tag", action="append", metavar="YORLIQ")
+    sp = add("add", "record an attempt", cmd_add)
+    sp.add_argument("what", nargs="+", metavar="TEXT")
+    sp.add_argument("--because", metavar="REASON", help="why it ended that way")
+    sp.add_argument("--tag", action="append", metavar="TAG")
     g = sp.add_mutually_exclusive_group()
-    g.add_argument("--failed", action="store_true", help="ishlamadi (sukut bo'yicha)")
-    g.add_argument("--worked", action="store_true", help="ishladi")
-    g.add_argument("--partial", action="store_true", help="qisman ishladi")
+    g.add_argument("--failed", action="store_true", help="it did not work (default)")
+    g.add_argument("--worked", action="store_true", help="it worked")
+    g.add_argument("--partial", action="store_true", help="it partly worked")
 
-    sp = add("check", "sinashdan oldin: bu allaqachon sinalganmi?", cmd_check)
-    sp.add_argument("query", nargs="+", metavar="MATN")
+    sp = add("check", "before you try: has this been tried already?", cmd_check)
+    sp.add_argument("query", nargs="+", metavar="TEXT")
     sp.add_argument("--threshold", type=float, default=0.5,
-                    help="mos kelish chegarasi 0..1 (sukut 0.5)")
+                    help="match threshold, 0..1 (default 0.5)")
 
-    sp = add("list", "oxirgi yozuvlar", cmd_list)
-    sp.add_argument("-n", type=int, default=10, help="nechta (sukut 10)")
+    sp = add("list", "recent entries", cmd_list)
+    sp.add_argument("-n", type=int, default=10, help="how many (default 10)")
     g = sp.add_mutually_exclusive_group()
     g.add_argument("--failed", action="store_true")
     g.add_argument("--worked", action="store_true")
 
-    sp = add("show", "bitta yozuvni to'liq ko'rsatish", cmd_show)
+    sp = add("show", "one entry in full", cmd_show)
     sp.add_argument("id", metavar="ID")
 
-    sp = add("rm", "xato yozuvni o'chirish", cmd_rm)
+    sp = add("rm", "remove a mistake", cmd_rm)
     sp.add_argument("id", metavar="ID")
     return p
 
@@ -356,12 +355,12 @@ def main(argv=None):
     except UsageError as e:
         if getattr(args, "json", False):
             emit_json({"ok": False, "error": str(e)})
-        print("xato: %s" % e, file=sys.stderr)
+        print("error: %s" % e, file=sys.stderr)
         return EXIT_USAGE
     except OSError as e:
         if getattr(args, "json", False):
             emit_json({"ok": False, "error": str(e)})
-        print("xato: %s" % e, file=sys.stderr)
+        print("error: %s" % e, file=sys.stderr)
         return EXIT_ERROR
 
 

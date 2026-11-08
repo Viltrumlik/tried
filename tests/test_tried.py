@@ -73,14 +73,14 @@ class CliTest(unittest.TestCase):
         self.run_cli("add", "sqlite WAL for the queue", "--because", "writers lock")
         out = self.run_cli("check", "sqlite WAL")
         self.assertEqual(out.returncode, 3)
-        self.assertIn("ALLAQACHON", out.stdout)
+        self.assertIn("ALREADY TRIED", out.stdout)
         self.assertIn("writers lock", out.stdout)
 
     def test_check_on_clear_ground_exits_0(self):
         self.run_cli("add", "sqlite WAL for the queue")
         out = self.run_cli("check", "kubernetes ingress")
         self.assertEqual(out.returncode, 0)
-        self.assertIn("toza", out.stdout)
+        self.assertIn("clear", out.stdout)
 
     def test_check_matches_the_reason_too_not_only_the_title(self):
         self.run_cli("add", "the queue rewrite", "--because", "postgres advisory locks deadlock")
@@ -121,7 +121,7 @@ class CliTest(unittest.TestCase):
         self.assertEqual(len(got), 2)
 
     def test_an_empty_log_says_so(self):
-        self.assertIn("bo'sh", self.run_cli("list").stdout)
+        self.assertIn("empty", self.run_cli("list").stdout)
 
     def test_show_and_rm_work_on_an_id_prefix(self):
         self.run_cli("add", "the one to remove")
