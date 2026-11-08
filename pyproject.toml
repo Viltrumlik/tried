@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tried"
+version = "0.1.0"
+description = "A log of what was already attempted in this repo, and why it didn't work."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Alisher Muhammadaliyev", email = "viltrumlik@gmail.com" }]
+keywords = ["decision-log", "context", "handoff", "claude-code", "codex", "cursor", "agent-skills"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development :: Version Control :: Git",
+]
+# Ataylab bo'sh va shunday qolishi kerak.
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/Viltrumlik/tried"
+Source = "https://github.com/Viltrumlik/tried"
+Issues = "https://github.com/Viltrumlik/tried/issues"
+Changelog = "https://github.com/Viltrumlik/tried/blob/main/CHANGELOG.md"
+
+[project.scripts]
+tried = "tried:main"
+
+[tool.setuptools]
+py-modules = ["tried", "tried_hook"]
+
+[tool.setuptools.package-dir]
+"" = "skills/tried/scripts"

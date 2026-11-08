@@ -1,0 +1,10 @@
+{
+  "name": "tried",
+  "description": "A log of approaches already attempted in this repo and why they failed, so a later session does not rediscover them the hard way.",
+  "version": "0.1.0",
+  "author": { "name": "Alisher", "url": "https://github.com/Viltrumlik" },
+  "homepage": "https://github.com/Viltrumlik/tried",
+  "repository": "https://github.com/Viltrumlik/tried",
+  "license": "MIT",
+  "keywords": ["tried", "decision-log", "context", "handoff", "claude-code", "codex", "cursor", "skills", "hooks"]
+}

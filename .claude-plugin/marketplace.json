@@ -1,0 +1,15 @@
+{
+  "name": "tried",
+  "owner": { "name": "Alisher", "url": "https://github.com/Viltrumlik" },
+  "metadata": { "description": "Remember what was already tried, across sessions." },
+  "plugins": [
+    {
+      "name": "tried",
+      "source": "./",
+      "description": "Logs approaches that were attempted and why they failed; a SessionStart hook puts them in front of the agent before it starts.",
+      "version": "0.1.0",
+      "category": "productivity",
+      "keywords": ["decision-log", "context", "handoff"]
+    }
+  ]
+}
